@@ -14,6 +14,7 @@ import "reflect-metadata"
 
 import { IsQueryRequiredIfNested } from "@/decorators/scrapers/is-query-required-if-nested.decorator"
 import { ParsingModelFieldType } from "@/enums/scrapers/parsing-model-field-type"
+import { EmptyToUndefined } from "../../decorators/empty-to-undefined"
 
 export class CreateParsingModelDto {
     @IsEnum(ParsingModelFieldType)
@@ -28,6 +29,7 @@ export class CreateParsingModelDto {
 export class CreateParsingModelFieldDto {
     @IsOptional()
     @IsString()
+    @EmptyToUndefined()
     @IsQueryRequiredIfNested("nested", {
         message: "`query` is required when `nested` is present.",
     })
@@ -35,6 +37,7 @@ export class CreateParsingModelFieldDto {
 
     @IsOptional()
     @IsString()
+    @EmptyToUndefined()
     extractor?: string
 
     @IsOptional()
@@ -42,6 +45,7 @@ export class CreateParsingModelFieldDto {
     multiple?: boolean
 
     @IsOptional()
+    @EmptyToUndefined()
     default?: any
 
     @IsOptional()
@@ -54,14 +58,15 @@ export class CreateRequestConfigDto {
     @IsOptional()
     @IsString()
     @IsNotEmpty()
+    @EmptyToUndefined()
     method?: string
 
     @IsOptional()
     @IsString()
     @IsNotEmpty()
+    @EmptyToUndefined()
     userAgent?: string
 }
-
 export class CreateScraperDto {
     @IsString()
     @IsNotEmpty()
@@ -70,10 +75,12 @@ export class CreateScraperDto {
     @IsOptional()
     @IsString()
     @IsNotEmpty()
+    @EmptyToUndefined()
     description?: string
 
     @IsOptional()
     @IsUrl()
+    @EmptyToUndefined()
     defaultUrl?: string
 
     @IsUUID()
