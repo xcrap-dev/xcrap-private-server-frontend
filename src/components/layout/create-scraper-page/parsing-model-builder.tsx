@@ -21,6 +21,8 @@ import ParsingModelFields from "./parsing-model-fields"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 
+import { Label } from "@/components/ui/label"
+
 type Props = {
     basePath?: string
 }
@@ -28,6 +30,7 @@ type Props = {
 const ParsingModelBuilder: FC<Props> = ({ basePath = "parsingModel" }) => {
     const form = useFormContext<CreateScraperDto>()
     const isRootPath = basePath === "parsingModel"
+    const modelState = form.getFieldState(`${basePath}.model` as any, form.formState)
 
     return (
         <Card>
@@ -81,20 +84,16 @@ const ParsingModelBuilder: FC<Props> = ({ basePath = "parsingModel" }) => {
                 />
             </CardHeader>
             <Separator />
-            <CardContent>
-                <FormField
-                    control={form.control}
-                    name={`${basePath}.model` as any}
-                    render={() => (
-                        <FormItem>
-                            <FormLabel>Campos *</FormLabel>
-                            <FormControl>
-                                <ParsingModelFields basePath={`${basePath}.model`} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+            <CardContent className="space-y-4">
+                <div className="space-y-1">
+                    <Label className="text-sm font-medium">Campos *</Label>
+                    {modelState.error?.message && (
+                        <p className="text-sm font-medium text-destructive">
+                            {String(modelState.error.message)}
+                        </p>
                     )}
-                />
+                </div>
+                <ParsingModelFields basePath={`${basePath}.model`} />
             </CardContent>
         </Card>
     )

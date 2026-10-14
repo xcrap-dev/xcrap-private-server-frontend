@@ -6,8 +6,10 @@ import { CreateScraperDto } from "@/dto/scrapers/create-scraper"
 import configHelper from "@/helpers/config"
 
 const useCreateScraperForm = () => {
-    const form = useForm({
+    const form = useForm<CreateScraperDto>({
         resolver: classValidatorResolver(CreateScraperDto),
+        mode: "onSubmit",
+        reValidateMode: "onBlur",
         defaultValues: {
             name: "",
             description: "",

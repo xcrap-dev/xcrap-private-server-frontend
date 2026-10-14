@@ -1,6 +1,6 @@
 "use client"
 
-import { LuBraces, LuGlobe, LuInfo, LuPlus } from "react-icons/lu"
+import { LuBraces, LuGlobe, LuInfo, LuPlus, LuSparkles } from "react-icons/lu"
 import { useRouter, useSearchParams } from "next/navigation"
 import { FC } from "react"
 
@@ -9,8 +9,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { getParsingModelTypeIcon } from "@/utils/get-parsing-model-type-icon"
 import useCreateScraperForm from "@/hooks/forms/use-create-scraper-form"
 import { CreateScraperDto } from "@/dto/scrapers/create-scraper"
+import { useWatch, type Control } from "react-hook-form"
+import { Typography } from "@/components/ui/typography"
 import ClientSelectorDialog from "./client-selector-dialog"
 import ParsingModelBuilder from "./parsing-model-builder"
+import OutputExampleTab from "./output-example-tab"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,12 +23,24 @@ type Props = {
     accessToken: string
 }
 
+const RootParsingModelTypeBadge: FC<{ control: Control<CreateScraperDto> }> = ({ control }) => {
+    const type = useWatch({
+        control,
+        name: "parsingModel.type",
+    })
+
+    return (
+        <Badge variant="outline">
+            {getParsingModelTypeIcon(type)} {type}
+        </Badge>
+    )
+}
+
 const CreateScraperForm: FC<Props> = ({ accessToken }) => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const tab = searchParams.get("tab") || "basic-info"
     const form = useCreateScraperForm()
-    const rootParsingModelType = form.watch("parsingModel.type")
 
     const handleTabChange = (newTab: string) => {
         const params = new URLSearchParams(Array.from(searchParams.entries()))
@@ -49,6 +64,9 @@ const CreateScraperForm: FC<Props> = ({ accessToken }) => {
                         </TabsTrigger>
                         <TabsTrigger value="parsing-model">
                             <LuBraces /> Modelo de Parsing
+                        </TabsTrigger>
+                        <TabsTrigger value="output-example">
+                            <LuSparkles /> Exemplo de Saída
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="basic-info" className="grid grid-cols-2 gap-x-2 gap-y-6">
@@ -115,26 +133,21 @@ const CreateScraperForm: FC<Props> = ({ accessToken }) => {
                             )}
                         />
                     </TabsContent>
-                    <TabsContent value="parsing-model">
-                        <FormField
-                            control={form.control}
-                            name="parsingModel"
-                            render={() => (
-                                <FormItem className="col-span-2">
-                                    <FormLabel>
-                                        Modelo de parsing raiz *{" "}
-                                        <Badge variant="outline">
-                                            {getParsingModelTypeIcon(rootParsingModelType)} {rootParsingModelType}
-                                        </Badge>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <ParsingModelBuilder />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                    <TabsContent value="parsing-model" className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <Typography.Small className="font-medium">
+                                Modelo de parsing raiz *
+                            </Typography.Small>
+                            <RootParsingModelTypeBadge control={form.control} />
+                        </div>
+                        <ParsingModelBuilder />
+                        {form.formState.errors.parsingModel?.message && (
+                            <Typography.Small className="text-destructive font-medium">
+                                {String(form.formState.errors.parsingModel.message)}
+                            </Typography.Small>
+                        )}
                     </TabsContent>
+                    <OutputExampleTab value="output-example" />
                 </Tabs>
                 <div className="col-span-2">
                     <Button>
