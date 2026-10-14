@@ -11,6 +11,7 @@ import ClientBasicInfoTab from "./client-section-tabs/basic-info-tab"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { FindOneClientResponse } from "@/services/api/clients"
+import { useCurrentUserApiKey } from "@/hooks/use-current-user-api-key"
 import ClientApiTab from "./client-section-tabs/api-tab"
 import { Typography } from "@/components/ui/typography"
 import { Separator } from "@/components/ui/separator"
@@ -25,6 +26,7 @@ type Props = {
 const ClientPageSection: FC<Props> = ({ data, accessToken }) => {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const { apiKey } = useCurrentUserApiKey(accessToken)
     const tab = searchParams.get("tab") || "basic-info"
 
     const handleTabChange = (newTab: string) => {
@@ -64,7 +66,7 @@ const ClientPageSection: FC<Props> = ({ data, accessToken }) => {
                             </TabsTrigger>
                         </TabsList>
                         <ClientBasicInfoTab data={data} />
-                        <ClientApiTab data={data} />
+                        <ClientApiTab data={data} apiKey={apiKey} />
                     </Tabs>
                 </CardContent>
                 <Separator />
