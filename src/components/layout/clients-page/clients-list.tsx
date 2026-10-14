@@ -1,8 +1,9 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
-import { LuGlobe } from "react-icons/lu"
-import { FC, useState } from "react"
+import { LuCirclePlus, LuGlobe, LuSearch } from "react-icons/lu"
+import { type FC, useEffect, useState } from "react"
 import NextLink from "next/link"
 
 import {
@@ -18,7 +19,11 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { findManyClients, FindManyClientsResponse } from "@/services/api/clients"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { renderClientType } from "@/utils/render-client-type"
+import { Typography } from "@/components/ui/typography"
+import { useDebounce } from "@/hooks/use-debounce"
 import formatDateTime from "@/utils/format-date-time"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 type Props = {
     initialData: FindManyClientsResponse
@@ -28,32 +33,48 @@ type Props = {
 const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const [data, setData] = useState(initialData)
 
-    const currentPage = data.meta.currentPage
-    const lastPage = data.meta.lastPage
+    const currentPage = Number(searchParams.get("page")) || initialData?.meta?.currentPage || 1
+    const [search, setSearch] = useState(searchParams.get("name") || "")
+    const debouncedSearch = useDebounce(search, 400)
+
+    // Sempre reseta para a página 1 ao alterar o termo de busca
+    useEffect(() => {
+        const currentParam = searchParams.get("name") || ""
+        if (debouncedSearch !== currentParam) {
+            const params = new URLSearchParams(searchParams.toString())
+            if (debouncedSearch.trim()) {
+                params.set("name", debouncedSearch.trim())
+            } else {
+                params.delete("name")
+            }
+            params.set("page", "1")
+            router.replace(`?${params.toString()}`)
+        }
+    }, [debouncedSearch, router, searchParams])
+
+    const { data: queryData } = useQuery<FindManyClientsResponse>({
+        queryKey: ["clients", { page: currentPage, name: debouncedSearch }],
+        queryFn: () => findManyClients({ page: currentPage, name: debouncedSearch }, accessToken),
+        placeholderData: (previousData) => previousData,
+        initialData:
+            currentPage === (initialData?.meta?.currentPage || 1) && !debouncedSearch ? initialData : undefined,
+    })
+
+    const data = queryData || initialData
+    const clients = data?.data || []
+    const meta = data?.meta || { total: clients.length, lastPage: 1, currentPage: 1, perPage: 10, prev: null, next: null }
+
+    const lastPage = meta.lastPage
     const hasNextPage = currentPage < lastPage
     const hasPreviousPage = currentPage > 1
 
     const handlePageChange = (page: number) => {
         if (page === currentPage || page < 1 || page > lastPage) return
 
-        const fetchNewData = async () => {
-            try {
-                const params = new URLSearchParams(searchParams.toString())
-
-                params.set("page", page.toString())
-                router.push(`?${params.toString()}`)
-
-                const newData = await findManyClients({ page }, accessToken)
-
-                setData(newData)
-            } catch (error) {
-                console.error("Erro ao carregar página:", error)
-            }
-        }
-
-        fetchNewData()
+        const params = new URLSearchParams(searchParams.toString())
+        params.set("page", page.toString())
+        router.push(`?${params.toString()}`)
     }
 
     const renderPaginationItems = () => {
@@ -153,82 +174,124 @@ const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
     return (
         <section className="pb-4">
             <Card>
-                <CardHeader>
-                    <CardTitle className="flex gap-1 items-center">
-                        <LuGlobe /> Lista de Clientes
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
+                    <CardTitle className="flex gap-2 items-center text-lg">
+                        <LuGlobe className="w-5 h-5 text-primary" /> Lista de Clientes
                     </CardTitle>
+                    <div className="flex items-center gap-2">
+                        <div className="relative w-full sm:w-64">
+                            <LuSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Buscar por nome do cliente..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9 h-9 text-xs"
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableCaption>
-                            {lastPage > 1
-                                ? `Exibindo ${data.data.length} itens de ${data.meta.total}.`
-                                : "Exibindo todos os itens."}
-                        </TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nome</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Criado em</TableHead>
-                                <TableHead>Atualizado em</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.data.map((client) => (
-                                <TableRow className="hover:bg-muted transition-colors" key={client.id}>
-                                    <TableCell>
-                                        <NextLink href={`/clients/${client.id}`}>{client.name}</NextLink>
-                                    </TableCell>
-                                    <TableCell>
-                                        <NextLink href={`/clients/${client.id}`}>
-                                            {renderClientType(client.type)}
-                                        </NextLink>
-                                    </TableCell>
-                                    <TableCell>
-                                        <NextLink href={`/clients/${client.id}`}>
-                                            {formatDateTime(client.createdAt)}
-                                        </NextLink>
-                                    </TableCell>
-                                    <TableCell>
-                                        <NextLink href={`/clients/${client.id}`}>
-                                            {formatDateTime(client.updatedAt)}
-                                        </NextLink>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    <div className="mt-4">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            if (hasPreviousPage) {
-                                                handlePageChange(currentPage - 1)
-                                            }
-                                        }}
-                                        className={!hasPreviousPage ? "pointer-events-none opacity-50" : ""}
-                                    />
-                                </PaginationItem>
-                                {renderPaginationItems()}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            if (hasNextPage) {
-                                                handlePageChange(currentPage + 1)
-                                            }
-                                        }}
-                                        className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
+                    {clients.length > 0 ? (
+                        <>
+                            <Table>
+                                <TableCaption>
+                                    {meta.total > 0
+                                        ? `Exibindo ${clients.length} itens de ${data.meta.total}.`
+                                        : "Exibindo todos os itens."}
+                                </TableCaption>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Nome</TableHead>
+                                        <TableHead>Tipo</TableHead>
+                                        <TableHead>Criado em</TableHead>
+                                        <TableHead>Atualizado em</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {clients.map((client) => (
+                                        <TableRow className="hover:bg-muted transition-colors" key={client.id}>
+                                            <TableCell>
+                                                <NextLink href={`/clients/${client.id}`}>{client.name}</NextLink>
+                                            </TableCell>
+                                            <TableCell>
+                                                <NextLink href={`/clients/${client.id}`}>
+                                                    {renderClientType(client.type)}
+                                                </NextLink>
+                                            </TableCell>
+                                            <TableCell>
+                                                <NextLink href={`/clients/${client.id}`}>
+                                                    {formatDateTime(client.createdAt)}
+                                                </NextLink>
+                                            </TableCell>
+                                            <TableCell>
+                                                <NextLink href={`/clients/${client.id}`}>
+                                                    {formatDateTime(client.updatedAt)}
+                                                </NextLink>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            {lastPage > 1 && (
+                                <div className="mt-4">
+                                    <Pagination>
+                                        <PaginationContent>
+                                            <PaginationItem>
+                                                <PaginationPrevious
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        if (hasPreviousPage) {
+                                                            handlePageChange(currentPage - 1)
+                                                        }
+                                                    }}
+                                                    className={!hasPreviousPage ? "pointer-events-none opacity-50" : ""}
+                                                />
+                                            </PaginationItem>
+                                            {renderPaginationItems()}
+                                            <PaginationItem>
+                                                <PaginationNext
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        if (hasNextPage) {
+                                                            handlePageChange(currentPage + 1)
+                                                        }
+                                                    }}
+                                                    className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
+                                                />
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="py-12 text-center space-y-3 border border-dashed rounded-lg">
+                            <LuGlobe className="w-10 h-10 text-muted-foreground/60 mx-auto" />
+                            <div className="space-y-1">
+                                <Typography.H4>
+                                    {search ? "Nenhum cliente corresponde aos filtros" : "Nenhum cliente cadastrado"}
+                                </Typography.H4>
+                                <Typography.Muted>
+                                    {search
+                                        ? `Não foram encontrados resultados para a busca "${search}".`
+                                        : "Cadastre novos clientes para começar a criar scrapers."}
+                                </Typography.Muted>
+                            </div>
+                            {search ? (
+                                <Button variant="outline" size="sm" onClick={() => setSearch("")}>
+                                    Limpar busca
+                                </Button>
+                            ) : (
+                                <Button asChild size="sm">
+                                    <NextLink href="/clients/create">
+                                        <LuCirclePlus className="w-4 h-4 mr-1.5" /> Criar primeiro cliente
+                                    </NextLink>
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </section>

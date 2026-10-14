@@ -74,12 +74,16 @@ interface Meta {
     next: number | null
 }
 
-interface FindManyClientsOptions {
+export interface FindManyClientsOptions {
     page?: number
     perPage?: number
+    name?: string
 }
 
-export async function findManyClients({ page, perPage }: FindManyClientsOptions = {}, accessToken: string) {
+export async function findManyClients(
+    { page, perPage, name }: FindManyClientsOptions = {},
+    accessToken: string,
+) {
     const response = await api.get<FindManyClientsResponse>("/clients", {
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -87,6 +91,7 @@ export async function findManyClients({ page, perPage }: FindManyClientsOptions 
         params: {
             page,
             perPage,
+            ...(name?.trim() ? { name: name.trim() } : {}),
         },
     })
 

@@ -144,12 +144,16 @@ interface Meta {
     next: number | null
 }
 
-interface FindManyScrapersOptions {
+export interface FindManyScrapersOptions {
     page?: number
     perPage?: number
+    name?: string
 }
 
-export async function findManyScrapers({ page, perPage }: FindManyScrapersOptions = {}, accessToken: string) {
+export async function findManyScrapers(
+    { page, perPage, name }: FindManyScrapersOptions = {},
+    accessToken: string,
+) {
     const response = await api.get<FindManyScrapersResponse>("/scrapers", {
         headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -157,6 +161,7 @@ export async function findManyScrapers({ page, perPage }: FindManyScrapersOption
         params: {
             page,
             perPage,
+            ...(name?.trim() ? { name: name.trim() } : {}),
         },
     })
 
