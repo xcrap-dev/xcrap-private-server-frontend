@@ -1,6 +1,25 @@
-# 🕷️ Xcrap Private Server - Frontend
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/assets/images/xcrap-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/assets/images/xcrap-logo-light.svg">
+    <img alt="Xcrap Logo" src="public/assets/images/xcrap-high-resolution-logo-transparent.png" width="340">
+  </picture>
+</p>
 
-The official web dashboard and management interface for **Xcrap Cloud** private server instances. Built with Next.js 16, React 19, Tailwind CSS v4, and Radix UI.
+<h1 align="center">Xcrap Private Server - Frontend</h1>
+
+<p align="center">
+  The official web dashboard and management interface for <b>Xcrap Cloud</b> private server instances.<br/>
+  Built with Next.js 16, React 19, Tailwind CSS v4, and Radix UI.
+</p>
+
+<p align="center">
+  <a href="https://xcrap.cloud">Website</a> •
+  <a href="#-features">Features</a> •
+  <a href="#%EF%B8%8F-getting-started">Getting Started</a> •
+  <a href="#-project-structure">Project Structure</a> •
+  <a href="#-license">License</a>
+</p>
 
 ---
 
