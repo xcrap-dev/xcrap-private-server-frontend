@@ -21,6 +21,7 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import CreateUserDialog from "@/components/users-page/create-user-dialog"
 import logoSquareDarkSvg from "../../../../public/assets/images/xcrap-logo-square.svg"
 import logoDarkSvg from "../../../../public/assets/images/xcrap-logo-dark.svg"
 
@@ -53,8 +54,8 @@ const clientItems = [
 const adminItems = [
     {
         title: "Criar Usuário",
-        url: "/admin/users/create",
         icon: LuUserPlus,
+        isDialog: true,
     },
     {
         title: "Lista de Usuários",
@@ -125,16 +126,31 @@ const AppSidebar: FC = () => {
                     <SidebarGroupLabel>Admin</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {adminItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            {adminItems.map((item) => {
+                                if (item.isDialog) {
+                                    return (
+                                        <SidebarMenuItem key={item.title}>
+                                            <CreateUserDialog>
+                                                <SidebarMenuButton tooltip={item.title}>
+                                                    <item.icon />
+                                                    <span>{item.title}</span>
+                                                </SidebarMenuButton>
+                                            </CreateUserDialog>
+                                        </SidebarMenuItem>
+                                    )
+                                }
+
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild tooltip={item.title}>
+                                            <a href={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </a>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )
+                            })}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
