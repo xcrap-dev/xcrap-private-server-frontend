@@ -2,9 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { FC, ReactNode, useState } from "react"
-
 import { LuArrowRight, LuExternalLink, LuGlobe } from "react-icons/lu"
-
 import NextLink from "next/link"
 
 import {
@@ -24,6 +22,7 @@ import { Button } from "@/components/ui/button"
 import Spinner from "@/components/ui/spinner"
 import { Badge } from "@/components/ui/badge"
 import configHelper from "@/helpers/config"
+import { useI18n } from "@/i18n"
 
 type Props = {
     children: ReactNode
@@ -38,6 +37,7 @@ const ClientSelectorDialog: FC<Props> = ({
     onChange: onChangeClientId,
     accessToken,
 }) => {
+    const { t } = useI18n()
     const [open, setOpen] = useState(false)
     const [page, setPage] = useState(1)
 
@@ -86,14 +86,14 @@ const ClientSelectorDialog: FC<Props> = ({
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Selecione um Cliente</DialogTitle>
+                    <DialogTitle>{t("createScraper.clientDialogTitle")}</DialogTitle>
                 </DialogHeader>
                 {isLoading ? (
                     <Typography.P className="animate-pulse duration-500">
-                        <Spinner /> Carregando...
+                        <Spinner /> {t("createScraper.clientDialogLoading")}
                     </Typography.P>
                 ) : isError ? (
-                    <Typography.P className="text-red-500">Erro ao buscar clientes</Typography.P>
+                    <Typography.P className="text-red-500">{t("createScraper.clientDialogError")}</Typography.P>
                 ) : (
                     <div>
                         <div className="space-y-2 mt-4">
@@ -113,7 +113,7 @@ const ClientSelectorDialog: FC<Props> = ({
                                             <div className="flex gap-2">
                                                 <Button size="xs" variant="secondary" asChild>
                                                     <NextLink target="_blank" href={`/clients/${client.id}`}>
-                                                        Visulizar
+                                                        {t("createScraper.view")}
                                                         <LuExternalLink />
                                                     </NextLink>
                                                 </Button>
@@ -126,10 +126,10 @@ const ClientSelectorDialog: FC<Props> = ({
                                                     size="xs"
                                                 >
                                                     {currentClientId === client.id ? (
-                                                        "Selecionado"
+                                                        t("createScraper.selected")
                                                     ) : (
                                                         <>
-                                                            Selecionar
+                                                            {t("createScraper.select")}
                                                             <LuArrowRight />
                                                         </>
                                                     )}

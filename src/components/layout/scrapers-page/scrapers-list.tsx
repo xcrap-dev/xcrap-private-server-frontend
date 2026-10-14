@@ -24,6 +24,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import formatDateTime from "@/utils/format-date-time"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useI18n } from "@/i18n"
 
 type Props = {
     initialData: FindManyScrapersResponse
@@ -31,6 +32,7 @@ type Props = {
 }
 
 const ScrapersListSection: FC<Props> = ({ initialData, accessToken }) => {
+    const { t } = useI18n()
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -176,13 +178,13 @@ const ScrapersListSection: FC<Props> = ({ initialData, accessToken }) => {
             <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
                     <CardTitle className="flex gap-2 items-center text-lg">
-                        <FaSpider className="w-5 h-5 text-primary" /> Lista de Scrapers
+                        <FaSpider className="w-5 h-5 text-primary" /> {t("scrapers.listTitle")}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                         <div className="relative w-full sm:w-64">
                             <LuSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Buscar por nome do scraper..."
+                                placeholder={t("scrapers.searchPlaceholder")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-9 h-9 text-xs"
@@ -197,14 +199,14 @@ const ScrapersListSection: FC<Props> = ({ initialData, accessToken }) => {
                                 <Table>
                                     <TableCaption>
                                         {meta.total > 0
-                                            ? `Exibindo ${scrapers.length} itens de ${data.meta.total}.`
-                                            : "Exibindo todos os itens."}
+                                            ? t("common.showingItems", { count: scrapers.length, total: data.meta.total })
+                                            : t("common.showingAllItems")}
                                     </TableCaption>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Nome</TableHead>
-                                            <TableHead>Criado em</TableHead>
-                                            <TableHead>Atualizado em</TableHead>
+                                            <TableHead>{t("scrapers.tableName")}</TableHead>
+                                            <TableHead>{t("scrapers.tableCreatedAt")}</TableHead>
+                                            <TableHead>{t("scrapers.tableUpdatedAt")}</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -235,62 +237,62 @@ const ScrapersListSection: FC<Props> = ({ initialData, accessToken }) => {
                                                     <PaginationPrevious
                                                         href="#"
                                                         onClick={(e) => {
-                                                            e.preventDefault()
-                                                            if (hasPreviousPage) {
-                                                                handlePageChange(currentPage - 1)
-                                                            }
-                                                        }}
-                                                        className={!hasPreviousPage ? "pointer-events-none opacity-50" : ""}
-                                                    />
-                                                </PaginationItem>
-                                                {renderPaginationItems()}
-                                                <PaginationItem>
-                                                    <PaginationNext
-                                                        href="#"
-                                                        onClick={(e) => {
-                                                            e.preventDefault()
-                                                            if (hasNextPage) {
-                                                                handlePageChange(currentPage + 1)
-                                                            }
-                                                        }}
-                                                        className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
-                                                    />
-                                                </PaginationItem>
-                                            </PaginationContent>
-                                        </Pagination>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <div className="py-12 text-center space-y-3 border border-dashed rounded-lg">
-                                <FaSpider className="w-10 h-10 text-muted-foreground/60 mx-auto" />
-                                <div className="space-y-1">
-                                    <Typography.H4>
-                                        {search ? "Nenhum scraper corresponde aos filtros" : "Nenhum scraper cadastrado"}
-                                    </Typography.H4>
-                                    <Typography.Muted>
-                                        {search
-                                            ? `Não foram encontrados resultados para a busca "${search}".`
-                                            : "Crie novos scrapers para começar a extrair dados."}
-                                    </Typography.Muted>
-                                </div>
-                                {search ? (
-                                    <Button variant="outline" size="sm" onClick={() => setSearch("")}>
-                                        Limpar busca
-                                    </Button>
-                                ) : (
-                                    <Button asChild size="sm">
-                                        <NextLink href="/scrapers/create">
-                                            <LuCirclePlus className="w-4 h-4 mr-1.5" /> Criar primeiro scraper
-                                        </NextLink>
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-        </section>
+                                                             e.preventDefault()
+                                                             if (hasPreviousPage) {
+                                                                 handlePageChange(currentPage - 1)
+                                                             }
+                                                         }}
+                                                         className={!hasPreviousPage ? "pointer-events-none opacity-50" : ""}
+                                                     />
+                                                 </PaginationItem>
+                                                 {renderPaginationItems()}
+                                                 <PaginationItem>
+                                                     <PaginationNext
+                                                         href="#"
+                                                         onClick={(e) => {
+                                                             e.preventDefault()
+                                                             if (hasNextPage) {
+                                                                 handlePageChange(currentPage + 1)
+                                                             }
+                                                         }}
+                                                         className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
+                                                     />
+                                                 </PaginationItem>
+                                             </PaginationContent>
+                                         </Pagination>
+                                     </div>
+                                 )}
+                             </>
+                         ) : (
+                             <div className="py-12 text-center space-y-3 border border-dashed rounded-lg">
+                                 <FaSpider className="w-10 h-10 text-muted-foreground/60 mx-auto" />
+                                 <div className="space-y-1">
+                                     <Typography.H4>
+                                         {search ? t("scrapers.emptyFilteredTitle") : t("scrapers.emptyTitle")}
+                                     </Typography.H4>
+                                     <Typography.Muted>
+                                         {search
+                                             ? t("scrapers.emptyFilteredDesc", { search })
+                                             : t("scrapers.emptyDesc")}
+                                     </Typography.Muted>
+                                 </div>
+                                 {search ? (
+                                     <Button variant="outline" size="sm" onClick={() => setSearch("")}>
+                                         {t("common.clearSearch")}
+                                     </Button>
+                                 ) : (
+                                     <Button asChild size="sm">
+                                         <NextLink href="/scrapers/create">
+                                             <LuCirclePlus className="w-4 h-4 mr-1.5" /> {t("scrapers.createFirst")}
+                                         </NextLink>
+                                     </Button>
+                                 )}
+                             </div>
+                         )}
+                     </div>
+                 </CardContent>
+             </Card>
+         </section>
     )
 }
 

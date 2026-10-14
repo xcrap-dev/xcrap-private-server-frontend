@@ -1,19 +1,23 @@
-import { FC } from "react"
+"use client"
 
+import { FC } from "react"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import CreateClientForm from "./create-client-form"
+import { useI18n } from "@/i18n"
 
 type Props = {
     accessToken: string
 }
 
 const CreateClientSection: FC<Props> = ({ accessToken }) => {
+    const { t } = useI18n()
+
     return (
         <section>
             <Card>
                 <CardHeader>
-                    <CardTitle>Criação de Cliente HTTP</CardTitle>
-                    <CardDescription>Preencha os dados abaixo para criar um novo cliente HTTP.</CardDescription>
+                    <CardTitle>{t("createClient.sectionTitle")}</CardTitle>
+                    <CardDescription>{t("createClient.sectionDesc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <CreateClientForm accessToken={accessToken} />

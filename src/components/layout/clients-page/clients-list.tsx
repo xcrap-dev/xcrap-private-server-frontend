@@ -24,6 +24,7 @@ import { useDebounce } from "@/hooks/use-debounce"
 import formatDateTime from "@/utils/format-date-time"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useI18n } from "@/i18n"
 
 type Props = {
     initialData: FindManyClientsResponse
@@ -31,6 +32,7 @@ type Props = {
 }
 
 const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
+    const { t } = useI18n()
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -176,13 +178,13 @@ const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
             <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
                     <CardTitle className="flex gap-2 items-center text-lg">
-                        <LuGlobe className="w-5 h-5 text-primary" /> Lista de Clientes
+                        <LuGlobe className="w-5 h-5 text-primary" /> {t("clients.listTitle")}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                         <div className="relative w-full sm:w-64">
                             <LuSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Buscar por nome do cliente..."
+                                placeholder={t("clients.searchPlaceholder")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-9 h-9 text-xs"
@@ -196,15 +198,15 @@ const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
                             <Table>
                                 <TableCaption>
                                     {meta.total > 0
-                                        ? `Exibindo ${clients.length} itens de ${data.meta.total}.`
-                                        : "Exibindo todos os itens."}
+                                        ? t("common.showingItems", { count: clients.length, total: data.meta.total })
+                                        : t("common.showingAllItems")}
                                 </TableCaption>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Nome</TableHead>
-                                        <TableHead>Tipo</TableHead>
-                                        <TableHead>Criado em</TableHead>
-                                        <TableHead>Atualizado em</TableHead>
+                                        <TableHead>{t("clients.tableName")}</TableHead>
+                                        <TableHead>{t("common.role")}</TableHead>
+                                        <TableHead>{t("clients.tableCreatedAt")}</TableHead>
+                                        <TableHead>{t("clients.tableUpdatedAt")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -271,22 +273,22 @@ const ClientsListSection: FC<Props> = ({ initialData, accessToken }) => {
                             <LuGlobe className="w-10 h-10 text-muted-foreground/60 mx-auto" />
                             <div className="space-y-1">
                                 <Typography.H4>
-                                    {search ? "Nenhum cliente corresponde aos filtros" : "Nenhum cliente cadastrado"}
+                                    {search ? t("clients.emptyFilteredTitle") : t("clients.emptyTitle")}
                                 </Typography.H4>
                                 <Typography.Muted>
                                     {search
-                                        ? `Não foram encontrados resultados para a busca "${search}".`
-                                        : "Cadastre novos clientes para começar a criar scrapers."}
+                                        ? t("clients.emptyFilteredDesc", { search })
+                                        : t("clients.emptyDesc")}
                                 </Typography.Muted>
                             </div>
                             {search ? (
                                 <Button variant="outline" size="sm" onClick={() => setSearch("")}>
-                                    Limpar busca
+                                    {t("common.clearSearch")}
                                 </Button>
                             ) : (
                                 <Button asChild size="sm">
                                     <NextLink href="/clients/create">
-                                        <LuCirclePlus className="w-4 h-4 mr-1.5" /> Criar primeiro cliente
+                                        <LuCirclePlus className="w-4 h-4 mr-1.5" /> {t("clients.createFirst")}
                                     </NextLink>
                                 </Button>
                             )}

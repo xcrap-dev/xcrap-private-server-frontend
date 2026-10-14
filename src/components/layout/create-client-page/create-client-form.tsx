@@ -16,12 +16,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Spinner from "../../ui/spinner"
+import { useI18n } from "@/i18n"
 
 type Props = {
     accessToken: string
 }
 
 const CreateClientForm: FC<Props> = ({ accessToken }) => {
+    const { t } = useI18n()
     const router = useRouter()
     const form = useCreateClientForm()
     const [isFetching, setIsFething] = useState(false)
@@ -30,13 +32,13 @@ const CreateClientForm: FC<Props> = ({ accessToken }) => {
         setIsFething(true)
 
         try {
-            toast.info(`Criando cliente "${data.name}"...`)
+            toast.info(t("createClient.creatingToast", { name: data.name }))
             const createdClient = await createClient(data, accessToken)
-            toast.success("Cliente criado com sucesso!")
+            toast.success(t("createClient.createSuccess"))
             router.push(`/clients/${createdClient.id}`)
         } catch (error) {
             console.error("Error when trying create client:", error)
-            toast.error("Ocorreu um erro ao tentar criar o cliente!")
+            toast.error(t("createClient.createError"))
         } finally {
             setIsFething(false)
         }
@@ -50,9 +52,9 @@ const CreateClientForm: FC<Props> = ({ accessToken }) => {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Nome *</FormLabel>
+                            <FormLabel>{t("createClient.nameLabel")}</FormLabel>
                             <FormControl>
-                                <Input placeholder="Cliente Axios Especial..." {...field} />
+                                <Input placeholder={t("createClient.namePlaceholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -63,11 +65,11 @@ const CreateClientForm: FC<Props> = ({ accessToken }) => {
                     name="type"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Tipo *</FormLabel>
+                            <FormLabel>{t("createClient.typeLabel")}</FormLabel>
                             <FormControl>
                                 <Select {...field} onValueChange={field.onChange}>
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Tipos de Cliente" />
+                                        <SelectValue placeholder={t("createClient.typePlaceholder")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {Object.values(ClientType).map((clientType) => (
@@ -87,9 +89,9 @@ const CreateClientForm: FC<Props> = ({ accessToken }) => {
                     name="description"
                     render={({ field }) => (
                         <FormItem className="col-span-2">
-                            <FormLabel>Descrição (opcional)</FormLabel>
+                            <FormLabel>{t("createClient.descLabel")}</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Este Cliente Axios Especial faz..." {...field} />
+                                <Textarea placeholder={t("createClient.descPlaceholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -104,11 +106,11 @@ const CreateClientForm: FC<Props> = ({ accessToken }) => {
                         {isFetching ? (
                             <>
                                 <Spinner />
-                                Criando Cliente...
+                                {t("createClient.submittingButton")}
                             </>
                         ) : (
                             <>
-                                <LuPlus /> Criar Cliente
+                                <LuPlus /> {t("createClient.submitButton")}
                             </>
                         )}
                     </Button>

@@ -1,9 +1,11 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="public/assets/images/xcrap-logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="public/assets/images/xcrap-logo-light.svg">
-    <img alt="Xcrap Logo" src="public/assets/images/xcrap-high-resolution-logo-transparent.png" width="340">
-  </picture>
+  <a href="https://xcrap.cloud">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="public/assets/images/xcrap-logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="public/assets/images/xcrap-logo-light.svg">
+      <img src="public/assets/images/xcrap-high-resolution-logo-transparent.png" alt="Xcrap Logo" width="340">
+    </picture>
+  </a>
 </p>
 
 <h1 align="center">Xcrap Private Server - Frontend</h1>
@@ -32,6 +34,8 @@
 - **🌐 Client Management**: Group scrapers under clients, view direct REST API endpoints, and copy SDK integration snippets.
 - **👥 Administrative User Management**: Manage users, assign roles (`ADMIN` / `USER`), copy IDs and API keys, and quickly create users via a modal from any screen.
 - **🔍 Debounced Search & Pagination**: Real-time server-side search by name across scrapers, clients, and users with synchronized URL query parameters.
+- **🌍 Internationalization (i18n)**: Seamless instant switching between English (`en`) and Portuguese (`pt-BR`) with persistent locale preferences.
+- **✨ Minimalist Welcome Portal**: Clean landing page at `/` with real-time server status, authenticated session routing, and feature overviews.
 - **🌓 Dark / Light Themes**: Fully responsive, high-contrast dark theme powered by Tailwind CSS v4 and Radix UI.
 
 ---

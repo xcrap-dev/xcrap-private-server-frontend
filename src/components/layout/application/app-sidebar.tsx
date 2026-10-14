@@ -3,7 +3,7 @@
 import { LuUser, LuChevronUp, LuGlobe, LuPlus, LuUsers, LuUserPlus } from "react-icons/lu"
 import { signOut, useSession } from "next-auth/react"
 import { FaSpider } from "react-icons/fa"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 
 import Link from "next/link"
 
@@ -24,81 +24,94 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import CreateUserDialog from "@/components/users-page/create-user-dialog"
 import logoSquareDarkSvg from "../../../../public/assets/images/xcrap-logo-square.svg"
 import logoDarkSvg from "../../../../public/assets/images/xcrap-logo-dark.svg"
-
-const scraperItems = [
-    {
-        title: "Criar Scraper",
-        url: "/scrapers/create",
-        icon: LuPlus,
-    },
-    {
-        title: "Lista de Scrapers",
-        url: "/scrapers",
-        icon: FaSpider,
-    },
-]
-
-const clientItems = [
-    {
-        title: "Criar Cliente",
-        url: "/clients/create",
-        icon: LuPlus,
-    },
-    {
-        title: "Lista de Clientes",
-        url: "/clients",
-        icon: LuGlobe,
-    },
-]
-
-const adminItems = [
-    {
-        title: "Criar Usuário",
-        icon: LuUserPlus,
-        isDialog: true,
-    },
-    {
-        title: "Lista de Usuários",
-        url: "/admin/users/",
-        icon: LuUsers,
-    },
-]
+import { useI18n } from "@/i18n"
 
 const AppSidebar: FC = () => {
     const { data: session, status } = useSession()
     const { open } = useSidebar()
+    const { t } = useI18n()
+
+    const scraperItems = useMemo(
+        () => [
+            {
+                title: t("sidebar.createScraper"),
+                url: "/scrapers/create",
+                icon: LuPlus,
+            },
+            {
+                title: t("sidebar.scrapersList"),
+                url: "/scrapers",
+                icon: FaSpider,
+            },
+        ],
+        [t],
+    )
+
+    const clientItems = useMemo(
+        () => [
+            {
+                title: t("sidebar.createClient"),
+                url: "/clients/create",
+                icon: LuPlus,
+            },
+            {
+                title: t("sidebar.clientsList"),
+                url: "/clients",
+                icon: LuGlobe,
+            },
+        ],
+        [t],
+    )
+
+    const adminItems = useMemo(
+        () => [
+            {
+                title: t("sidebar.createUser"),
+                icon: LuUserPlus,
+                isDialog: true,
+            },
+            {
+                title: t("sidebar.usersList"),
+                url: "/admin/users/",
+                icon: LuUsers,
+            },
+        ],
+        [t],
+    )
 
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu className="py-4 flex items-center justify-start">
-                    {open ? (
-                        <img
-                            src={logoDarkSvg.src}
-                            alt="Xcrap - Logo Completa"
-                            className="h-6 w-auto object-contain transition-opacity duration-300 invert dark:invert-0"
-                        />
-                    ) : (
-                        <img
-                            src={logoSquareDarkSvg.src}
-                            alt="Xcrap - Ícone"
-                            className="h-8 w-8 object-contain transition-transform duration-300 invert dark:invert-0"
-                        />
-                    )}
+                    <Link href="/" className="flex items-center">
+                        {open ? (
+                            <img
+                                src={logoDarkSvg.src}
+                                alt="Xcrap - Logo Completa"
+                                className="h-6 w-auto object-contain transition-opacity duration-300 invert dark:invert-0"
+                            />
+                        ) : (
+                            <img
+                                src={logoSquareDarkSvg.src}
+                                alt="Xcrap - Ícone"
+                                className="h-8 w-8 object-contain transition-transform duration-300 invert dark:invert-0"
+                            />
+                        )}
+                    </Link>
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Clientes</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t("sidebar.clients")}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {clientItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
+                                    <SidebarMenuButton asChild tooltip={item.title}>
+                                        <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </a>
+                                        </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -106,16 +119,16 @@ const AppSidebar: FC = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Scrapers</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t("sidebar.scrapers")}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {scraperItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
+                                    <SidebarMenuButton asChild tooltip={item.title}>
+                                        <Link href={item.url}>
                                             <item.icon />
                                             <span>{item.title}</span>
-                                        </a>
+                                        </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -123,7 +136,7 @@ const AppSidebar: FC = () => {
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t("sidebar.admin")}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {adminItems.map((item) => {
@@ -143,10 +156,10 @@ const AppSidebar: FC = () => {
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild tooltip={item.title}>
-                                            <a href={item.url}>
+                                            <Link href={item.url || "#"}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )
@@ -160,7 +173,7 @@ const AppSidebar: FC = () => {
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton>
-                                <LuUser /> Carregando...
+                                <LuUser /> {t("sidebar.loadingUser")}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
@@ -171,16 +184,16 @@ const AppSidebar: FC = () => {
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton>
                                         <LuUser className="mr-2" />
-                                        {session.user?.name || session.user?.email || "Usuário"}
+                                        {session.user?.name || session.user?.email || t("common.user")}
                                         <LuChevronUp className="ml-auto" />
                                     </SidebarMenuButton>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
                                     <DropdownMenuItem asChild>
-                                        <Link href="/account">Conta</Link>
+                                        <Link href="/account">{t("sidebar.account")}</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => signOut()}>
-                                        <span>Sair</span>
+                                        <span>{t("sidebar.logout")}</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

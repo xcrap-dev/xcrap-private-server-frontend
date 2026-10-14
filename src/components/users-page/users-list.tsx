@@ -44,6 +44,7 @@ import formatDateTime from "@/utils/format-date-time"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { useI18n } from "@/i18n"
 
 type Props = {
     initialData: FindManyUsersResponse
@@ -51,6 +52,7 @@ type Props = {
 }
 
 const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
+    const { t } = useI18n()
     const router = useRouter()
     const searchParams = useSearchParams()
     const queryClient = useQueryClient()
@@ -218,13 +220,13 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
             <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
                     <CardTitle className="flex gap-2 items-center text-lg">
-                        <LuUsers className="w-5 h-5 text-primary" /> Lista de Usuários
+                        <LuUsers className="w-5 h-5 text-primary" /> {t("users.listTitle")}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                         <div className="relative w-full sm:w-64">
                             <LuSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Buscar por nome..."
+                                placeholder={t("users.searchPlaceholder")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-9 h-9 text-xs"
@@ -238,17 +240,17 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                             <Table>
                                 <TableCaption>
                                     {meta.total > 0
-                                        ? `Exibindo ${users.length} de ${meta.total} usuários cadastrados.`
-                                        : "Nenhum usuário cadastrado."}
+                                        ? t("common.showingItems", { count: users.length, total: meta.total })
+                                        : t("common.showingAllItems")}
                                 </TableCaption>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Usuário</TableHead>
-                                        <TableHead>Username</TableHead>
-                                        <TableHead>E-mail</TableHead>
-                                        <TableHead>Cargo</TableHead>
-                                        <TableHead>Criado em</TableHead>
-                                        <TableHead className="w-[80px] text-right">Ações</TableHead>
+                                        <TableHead>{t("users.tableUser")}</TableHead>
+                                        <TableHead>{t("users.tableUsername")}</TableHead>
+                                        <TableHead>{t("users.tableEmail")}</TableHead>
+                                        <TableHead>{t("users.tableRole")}</TableHead>
+                                        <TableHead>{t("users.tableCreatedAt")}</TableHead>
+                                        <TableHead className="w-[80px] text-right">{t("users.tableActions")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -293,11 +295,11 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                                                             variant="default"
                                                             className="font-mono text-[10px] gap-1"
                                                         >
-                                                            <LuShield className="w-3 h-3" /> ADMIN
+                                                            <LuShield className="w-3 h-3" /> {t("users.roleAdmin")}
                                                         </Badge>
                                                     ) : (
                                                         <Badge variant="secondary" className="font-mono text-[10px]">
-                                                            {user.role || "USER"}
+                                                            {user.role || t("users.roleUser")}
                                                         </Badge>
                                                     )}
                                                 </TableCell>
@@ -311,26 +313,26 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 className="h-8 w-8 rounded-full"
-                                                                title="Ações"
+                                                                title={t("users.tableActions")}
                                                             >
                                                                 <HiDotsVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end" className="w-48">
-                                                            <DropdownMenuLabel>Ações do Usuário</DropdownMenuLabel>
+                                                            <DropdownMenuLabel>{t("users.tableActions")}</DropdownMenuLabel>
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem
-                                                                onClick={() => handleCopy(user.id, "ID do Usuário")}
+                                                                onClick={() => handleCopy(user.id, "ID")}
                                                             >
-                                                                <LuCopy className="mr-2 h-4 w-4" /> Copiar ID
+                                                                <LuCopy className="mr-2 h-4 w-4" /> {t("users.copyId")}
                                                             </DropdownMenuItem>
                                                             {user.apiKey && (
                                                                 <DropdownMenuItem
                                                                     onClick={() =>
-                                                                        handleCopy(user.apiKey, "Chave de API")
+                                                                        handleCopy(user.apiKey, "API Key")
                                                                     }
                                                                 >
-                                                                    <LuKey className="mr-2 h-4 w-4" /> Copiar API Key
+                                                                    <LuKey className="mr-2 h-4 w-4" /> {t("users.copyApiKey")}
                                                                 </DropdownMenuItem>
                                                             )}
                                                             <DropdownMenuSeparator />
@@ -338,7 +340,7 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                                                                 variant="destructive"
                                                                 onClick={() => setUserToDelete(user)}
                                                             >
-                                                                <LuTrash className="mr-2 h-4 w-4" /> Excluir Usuário
+                                                                <LuTrash className="mr-2 h-4 w-4" /> {t("users.deleteUser")}
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
@@ -388,23 +390,23 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                             <div className="space-y-1">
                                 <Typography.H4>
                                     {search
-                                        ? "Nenhum usuário corresponde aos filtros"
-                                        : "Nenhum usuário cadastrado"}
+                                        ? t("users.emptyFilteredTitle")
+                                        : t("users.emptyTitle")}
                                 </Typography.H4>
                                 <Typography.Muted>
                                     {search
-                                        ? `Não foram encontrados resultados para a busca "${search}".`
-                                        : "Cadastre novos usuários para conceder acesso ao sistema."}
+                                        ? t("users.emptyFilteredDesc", { search })
+                                        : t("users.emptyDesc")}
                                 </Typography.Muted>
                             </div>
                             {search ? (
                                 <Button variant="outline" size="sm" onClick={() => setSearch("")}>
-                                    Limpar busca
+                                    {t("common.clearSearch")}
                                 </Button>
                             ) : (
                                 <CreateUserDialog>
                                     <Button size="sm">
-                                        <LuUserPlus className="w-4 h-4 mr-1.5" /> Criar primeiro usuário
+                                        <LuUserPlus className="w-4 h-4 mr-1.5" /> {t("users.createUser")}
                                     </Button>
                                 </CreateUserDialog>
                             )}
@@ -417,17 +419,15 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
             <Dialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Excluir Usuário</DialogTitle>
+                        <DialogTitle>{t("users.deleteConfirmTitle")}</DialogTitle>
                         <DialogDescription>
-                            Tem certeza que deseja excluir o usuário{" "}
-                            <b>{userToDelete?.name}</b> (@{userToDelete?.username})?
-                            Esta ação é permanente e revogará todas as permissões e chaves de API associadas a esta conta.
+                            {t("users.deleteConfirmDesc", { name: userToDelete?.name || "" })}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline" disabled={isDeleting}>
-                                Cancelar
+                                {t("common.cancel")}
                             </Button>
                         </DialogClose>
                         <Button
@@ -435,7 +435,7 @@ const UsersListSection: FC<Props> = ({ initialData, accessToken }) => {
                             onClick={handleDeleteUser}
                             disabled={isDeleting}
                         >
-                            {isDeleting ? "Excluindo..." : "Confirmar Exclusão"}
+                            {isDeleting ? t("common.deleting") : t("common.confirm")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

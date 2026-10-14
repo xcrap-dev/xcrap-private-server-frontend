@@ -32,6 +32,7 @@ import { queryClient } from "@/helpers/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { UserRole } from "@/enums/users/role"
+import { useI18n } from "@/i18n"
 
 type Props = {
     children?: ReactNode
@@ -46,6 +47,7 @@ const CreateUserDialog: FC<Props> = ({
     onOpenChange: setControlledOpen,
     onSuccess,
 }) => {
+    const { t } = useI18n()
     const router = useRouter()
     const { data: session } = useSession()
     const [internalOpen, setInternalOpen] = useState(false)
@@ -97,8 +99,8 @@ const CreateUserDialog: FC<Props> = ({
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
             <DialogContent className="space-y-6">
                 <DialogHeader>
-                    <DialogTitle>Criar usuário</DialogTitle>
-                    <DialogDescription>Insira os dados do novo usuário para criá-lo.</DialogDescription>
+                    <DialogTitle>{t("users.createDialogTitle")}</DialogTitle>
+                    <DialogDescription>{t("users.createDialogDesc")}</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form
@@ -111,7 +113,7 @@ const CreateUserDialog: FC<Props> = ({
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Nome *</FormLabel>
+                                    <FormLabel>{t("users.fieldName")} *</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Marcuth" {...field} />
                                     </FormControl>
@@ -124,7 +126,7 @@ const CreateUserDialog: FC<Props> = ({
                             name="username"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username *</FormLabel>
+                                    <FormLabel>{t("users.fieldUsername")} *</FormLabel>
                                     <FormControl>
                                         <Input placeholder="marcuth" {...field} />
                                     </FormControl>
@@ -137,7 +139,7 @@ const CreateUserDialog: FC<Props> = ({
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>E-mail *</FormLabel>
+                                    <FormLabel>{t("users.fieldEmail")} *</FormLabel>
                                     <FormControl>
                                         <Input type="email" placeholder="usuario@exemplo.com" {...field} />
                                     </FormControl>
@@ -150,18 +152,18 @@ const CreateUserDialog: FC<Props> = ({
                             name="role"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Cargo *</FormLabel>
+                                    <FormLabel>{t("users.fieldRole")} *</FormLabel>
                                     <FormControl>
                                         <Select value={field.value} onValueChange={field.onChange}>
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Selecione um cargo" />
+                                                <SelectValue placeholder={t("users.fieldRole")} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectLabel>Cargos de usuário</SelectLabel>
+                                                    <SelectLabel>{t("users.fieldRole")}</SelectLabel>
                                                     {Object.values(UserRole).map((role) => (
                                                         <SelectItem value={role} key={role}>
-                                                            {role}
+                                                            {role === "ADMIN" ? t("users.roleSelectAdmin") : t("users.roleSelectUser")}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectGroup>
@@ -177,7 +179,7 @@ const CreateUserDialog: FC<Props> = ({
                             name="password"
                             render={({ field }) => (
                                 <FormItem className="col-span-2">
-                                    <FormLabel>Senha *</FormLabel>
+                                    <FormLabel>{t("users.fieldPassword")} *</FormLabel>
                                     <FormControl>
                                         <Input placeholder="••••••••" type="password" {...field} />
                                     </FormControl>
@@ -190,11 +192,11 @@ const CreateUserDialog: FC<Props> = ({
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline" disabled={isSubmitting}>
-                            Cancelar
+                            {t("common.cancel")}
                         </Button>
                     </DialogClose>
                     <Button type="submit" form="create-user-dialog-form" disabled={isSubmitting}>
-                        {isSubmitting ? "Criando..." : "Criar usuário"}
+                        {isSubmitting ? t("common.creating") : t("users.createUser")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

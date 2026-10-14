@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { signIn } from "next-auth/react"
-import { FC, useState } from "react"
+import { FC, useState, useMemo } from "react"
 import * as z from "zod"
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -12,23 +12,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/i18n"
 
 type Props = React.ComponentProps<"div">
 
-// 1. Defina o schema de validação com Zod
-const formSchema = z.object({
-    username: z.string().email("Por favor, insira um email válido."),
-    password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
-})
-
-type FormData = z.infer<typeof formSchema>
-
 const SignInForm: FC<Props> = ({ className, ...props }) => {
+    const { t } = useI18n()
     const [isLoading, setIsLoading] = useState(false)
     const [loginError, setLoginError] = useState<string | null>(null)
     const router = useRouter()
 
-    // 2. Inicialize o formulário usando useForm
+    const formSchema = useMemo(
+        () =>
+            z.object({
+                username: z.string().email(t("auth.invalidEmail")),
+                password: z.string().min(6, t("auth.passwordMinLength")),
+            }),
+        [t],
+    )
+
+    type FormData = z.infer<typeof formSchema>
+
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -37,7 +41,6 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
         },
     })
 
-    // 3. Defina a função de envio
     const onSubmit = async (values: FormData) => {
         setIsLoading(true)
         setLoginError(null)
@@ -51,7 +54,7 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
 
         if (result?.error) {
             console.error(result.error)
-            setLoginError("Credenciais inválidas. Verifique seu email e senha.")
+            setLoginError(t("auth.invalidCredentials"))
         } else {
             router.push("/scrapers")
         }
@@ -61,8 +64,8 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Entre na sua conta</CardTitle>
-                    <CardDescription>Insira seu email e senha para acessar a plataforma</CardDescription>
+                    <CardTitle>{t("auth.signInTitle")}</CardTitle>
+                    <CardDescription>{t("auth.signInSubtitle")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
@@ -73,9 +76,13 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
                                     name="username"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Email</FormLabel>
+                                            <FormLabel>{t("auth.usernameLabel")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="m@example.com" type="email" {...field} />
+                                                <Input
+                                                    placeholder={t("auth.usernamePlaceholder")}
+                                                    type="email"
+                                                    {...field}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -86,9 +93,9 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Senha</FormLabel>
+                                            <FormLabel>{t("auth.passwordLabel")}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="********" type="password" {...field} />
+                                                <Input placeholder="••••••••" type="password" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -97,7 +104,7 @@ const SignInForm: FC<Props> = ({ className, ...props }) => {
                                 {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
                                 <div className="flex flex-col gap-3">
                                     <Button type="submit" className="w-full" disabled={isLoading}>
-                                        {isLoading ? "Entrando..." : "Entrar"}
+                                        {isLoading ? t("auth.submitting") : t("auth.submitButton")}
                                     </Button>
                                 </div>
                             </div>

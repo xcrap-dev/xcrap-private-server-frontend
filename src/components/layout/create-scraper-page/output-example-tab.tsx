@@ -15,12 +15,14 @@ import CodeBlock from "@/components/ui/code-block"
 import { TabsContent } from "@/components/ui/tabs"
 import configHelper from "@/helpers/config"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n"
 
 type Props = {
     value?: string
 }
 
 const OutputExampleTab: FC<Props> = ({ value = "output-example" }) => {
+    const { t } = useI18n()
     const form = useFormContext<CreateScraperDto>()
     const [refreshToken, setRefreshToken] = useState(0)
     const [viewMode, setViewMode] = useState<"json" | "sdk">("json")
@@ -39,7 +41,7 @@ const OutputExampleTab: FC<Props> = ({ value = "output-example" }) => {
     const dynamicSdkCode = useMemo(() => {
         const formValues = form.getValues()
         const baseUrl = configHelper.apiUrl || "http://localhost:3000/api"
-        const effectiveApiKey = userApiKey || "SUA_API_KEY_AQUI"
+        const effectiveApiKey = userApiKey || "YOUR_API_KEY_HERE"
         const formattedModel = JSON.stringify(parsingModel, null, 2)
             .split("\n")
             .map((line, idx) => (idx === 0 ? line : `  ${line}`))
@@ -47,25 +49,20 @@ const OutputExampleTab: FC<Props> = ({ value = "output-example" }) => {
 
         return `import { Xcrap } from "@xcrap/api"
 
-// 1. Inicialize o SDK Xcrap com sua API Key e a URL do servidor
 const xcrap = new Xcrap({
   apiKey: "${effectiveApiKey}",
   baseUrl: "${baseUrl}",
 })
 
 async function run() {
-  console.log("Executando scraper dinâmico...")
-
-  // 2. Executa a raspagem em tempo real passando o modelo de parsing configurado
   const { data, metadata } = await xcrap.scrapers.executeOneDynamic({
     url: "${formValues.defaultUrl || "https://example.com"}",
-    clientId: "${formValues.clientId || "SEU_CLIENT_ID"}",
+    clientId: "${formValues.clientId || "YOUR_CLIENT_ID"}",
     parsingModel: ${formattedModel},
   })
 
   console.log("Status HTTP:", metadata.response.status)
-  console.log("Duração:", metadata.request.duration, "ms")
-  console.log("Resultado da extração:")
+  console.log("Duration:", metadata.request.duration, "ms")
   console.log(JSON.stringify(data, null, 2))
 }
 
@@ -82,26 +79,25 @@ run().catch(console.error)`
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <LuSparkles className="w-4 h-4 text-primary" />
-                        <Typography.H3>Exemplo de Saída Inferido</Typography.H3>
+                        <Typography.H3>{t("createScraper.outputExampleTitle")}</Typography.H3>
                     </div>
                     <Typography.Muted>
-                        Estrutura JSON estimada e código de integração Node.js que o scraper produzirá com base no
-                        modelo configurado.
+                        {t("createScraper.outputExampleDesc")}
                     </Typography.Muted>
                 </div>
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                     <Tabs value={viewMode} onValueChange={(val) => setViewMode(val as "json" | "sdk")}>
                         <TabsList className="h-8">
                             <TabsTrigger value="json" className="text-xs flex items-center gap-1.5 h-7">
-                                <LuFileJson className="w-3.5 h-3.5" /> JSON de Saída
+                                <LuFileJson className="w-3.5 h-3.5" /> {t("createScraper.jsonOutput")}
                             </TabsTrigger>
                             <TabsTrigger value="sdk" className="text-xs flex items-center gap-1.5 h-7">
-                                <LuCode className="w-3.5 h-3.5" /> Código SDK (@xcrap/api)
+                                <LuCode className="w-3.5 h-3.5" /> {t("createScraper.sdkCode")}
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
                     <Button variant="outline" size="sm" type="button" onClick={handleRefresh} className="h-8">
-                        <LuRefreshCw className="w-3.5 h-3.5" /> Atualizar
+                        <LuRefreshCw className="w-3.5 h-3.5" /> {t("createScraper.refresh")}
                     </Button>
                 </div>
             </div>
@@ -116,7 +112,7 @@ run().catch(console.error)`
                             </div>
                         </CardHeader>
                         <CardContent className="p-4">
-                            <JsonViewer data={output} initialExpanded={true} fileName="exemplo-saida-scraper.json" />
+                            <JsonViewer data={output} initialExpanded={true} fileName="scraper-output-example.json" />
                         </CardContent>
                     </Card>
                 ) : (
@@ -133,10 +129,9 @@ run().catch(console.error)`
                     <CardContent className="py-12 text-center space-y-3">
                         <LuFileJson className="w-10 h-10 text-muted-foreground/60 mx-auto" />
                         <div className="space-y-1">
-                            <Typography.H4>Nenhum campo configurado ainda</Typography.H4>
+                            <Typography.H4>{t("createScraper.noFieldsYet")}</Typography.H4>
                             <Typography.Muted>
-                                Vá para a aba &quot;Modelo de Parsing&quot; e adicione campos para visualizar a
-                                inferência da estrutura de saída e o código SDK.
+                                {t("createScraper.noFieldsDesc")}
                             </Typography.Muted>
                         </div>
                     </CardContent>
