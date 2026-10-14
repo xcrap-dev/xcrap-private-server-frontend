@@ -1,6 +1,6 @@
 "use client"
 
-import { LuBraces, LuFileJson2, LuInfo, LuPlay, LuUnplug } from "react-icons/lu"
+import { LuBraces, LuFileJson2, LuInfo, LuPlay, LuSparkles, LuUnplug } from "react-icons/lu"
 import { useRouter, useSearchParams } from "next/navigation"
 import { HiDotsVertical } from "react-icons/hi"
 import { FaSpider } from "react-icons/fa"
@@ -12,7 +12,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import ScraperExecutionDialog from "@/components/features/scraper-page/scraper-execution-dialog"
 import ScraperDropdownMenu from "@/components/features/scraper-page/scraper-dropdown-menu"
 import ScraperExecutionOutputTab from "./scraper-section-tabs/execution-output-tab"
+import ScraperOutputExampleTab from "./scraper-section-tabs/output-example-tab"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useCurrentUserApiKey } from "@/hooks/use-current-user-api-key"
 import ScraperParsingModelTab from "./scraper-section-tabs/parsing-model-tab"
 import ScraperBasicInfoTab from "./scraper-section-tabs/basic-info-tab"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -32,6 +34,7 @@ type Props = {
 const ScraperPageSection: FC<Props> = ({ data, accessToken }) => {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const { apiKey } = useCurrentUserApiKey(accessToken)
     const [executionResponse, setExecutionResponse] = useState<ExecuteOneScraperResponse<any> | null>(null)
     const [isExecuting, setIsExecuting] = useState(false)
     const tab = searchParams.get("tab") || "basic-info"
@@ -108,6 +111,9 @@ const ScraperPageSection: FC<Props> = ({ data, accessToken }) => {
                             <TabsTrigger disabled={isExecuting} value="parsing-model">
                                 <LuBraces /> Modelo de Parsing
                             </TabsTrigger>
+                            <TabsTrigger disabled={isExecuting} value="output-example">
+                                <LuSparkles /> Exemplo de Saída
+                            </TabsTrigger>
                             <TabsTrigger value="execution-output">
                                 <LuFileJson2 /> Saída de Execução
                             </TabsTrigger>
@@ -117,8 +123,9 @@ const ScraperPageSection: FC<Props> = ({ data, accessToken }) => {
                         </TabsList>
                         <ScraperBasicInfoTab data={data} />
                         <ScraperParsingModelTab data={data} />
+                        <ScraperOutputExampleTab data={data} />
                         <ScraperExecutionOutputTab response={executionResponse} scraper={data} />
-                        <ScraperApiTab data={data} />
+                        <ScraperApiTab data={data} apiKey={apiKey} />
                     </Tabs>
                 </CardContent>
                 <Separator />
