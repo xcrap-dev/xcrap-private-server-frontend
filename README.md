@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🕷️ Xcrap Private Server - Frontend
 
-## Getting Started
+The official web dashboard and management interface for **Xcrap Cloud** private server instances. Built with Next.js 16, React 19, Tailwind CSS v4, and Radix UI.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- **🎯 Visual Parsing Model Builder**: Construct web scrapers with nested selectors, extraction attributes, regex cleaners, default values, and collapsible tree sections for high performance.
+- **🔮 Real-Time Inferred Output Preview**: Dynamically estimates and visualizes the JSON output structure that the configured scraper model will produce.
+- **⚡ In-Browser Scraper Execution**: Execute scrapers on demand, inspect HTTP metadata, latency/duration, and browse syntax-highlighted JSON results.
+- **📦 SDK Code Generator**: Automatically produces ready-to-run TypeScript and Node.js code snippets using `@xcrap/api`, automatically injecting your logged-in user's API Key.
+- **🌐 Client Management**: Group scrapers under clients, view direct REST API endpoints, and copy SDK integration snippets.
+- **👥 Administrative User Management**: Manage users, assign roles (`ADMIN` / `USER`), copy IDs and API keys, and quickly create users via a modal from any screen.
+- **🔍 Debounced Search & Pagination**: Real-time server-side search by name across scrapers, clients, and users with synchronized URL query parameters.
+- **🌓 Dark / Light Themes**: Fully responsive, high-contrast dark theme powered by Tailwind CSS v4 and Radix UI.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & [Radix UI](https://www.radix-ui.com/)
+- **State & Data Fetching**: [TanStack Query v5](https://tanstack.com/query) & [Axios](https://axios-http.com/)
+- **Forms & Validation**: [React Hook Form](https://react-hook-form.com/) & [Class-Validator](https://github.com/typestack/class-validator)
+- **Authentication**: [NextAuth.js v4](https://next-auth.js.org/)
+- **Code Highlighting**: [PrismJS](https://prismjs.com/)
+- **Icons & Feedback**: [React Icons](https://react-icons.github.io/react-icons/), [Lucide](https://lucide.dev/), and [Sonner](https://sonner.emilkowal.ski/)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js**: `20.x` or higher
+- **Package Manager**: `npm`, `pnpm`, or `yarn`
+- An active instance of the **Xcrap Backend API** (default: `http://localhost:3000/api`)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/xcrap-private-server-frontend.git
+   cd xcrap-private-server-frontend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables:**
+   Create a `.env.local` file in the root directory:
+   ```env
+   # API Backend Base URL
+   NEXT_PUBLIC_API_URL=http://localhost:3000/api
+
+   # NextAuth Configuration
+   NEXTAUTH_URL=http://localhost:3001
+   NEXTAUTH_SECRET=your-super-secret-random-jwt-key
+   ```
+
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open the application:**
+   Navigate to [http://localhost:3000](http://localhost:3000) (or the port indicated in your terminal).
+
+---
+
+## 📁 Project Structure
+
+```text
+src/
+├── app/                  # Next.js App Router (pages, layouts, auth handlers)
+│   ├── (auth)/           # Authentication pages (sign-in)
+│   ├── (dashboard)/      # Protected dashboard routes (clients, scrapers, admin)
+│   └── api/auth/         # NextAuth route handler
+├── components/           # React components
+│   ├── features/         # Feature-specific widgets (code generators, dialogs)
+│   ├── layout/           # Page sections and tab layouts
+│   └── ui/               # Reusable UI primitives (buttons, tables, modals)
+├── dto/                  # Data Transfer Objects with validation decorators
+├── enums/                # Enumerations (UserRole, SelectorType, etc.)
+├── helpers/              # Config, regex, and QueryClient helpers
+├── hooks/                # Custom React hooks (debounce, API key, forms)
+├── services/api/         # Axios API clients for backend communication
+└── utils/                # Output inference, date formatting, token utilities
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📜 Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+| :--- | :--- |
+| `npm run dev` | Starts the Next.js development server with hot-reload |
+| `npm run build` | Compiles the production-ready build |
+| `npm run start` | Runs the compiled production server |
+| `npm run lint` | Runs ESLint to check for code quality issues |
+| `npm run format` | Formats all code using Prettier |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔒 Authentication Flow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. The frontend authenticates users against the backend's `/auth/sign-in` endpoint using email and password.
+2. NextAuth handles the session and signs a secure JWT cookie containing the `accessToken`.
+3. To obtain the user's permanent **API Key**, the frontend decodes the session token payload to retrieve the user ID and queries `/users/:id`.
+4. API keys are automatically populated in SDK code generation panels for seamless developer experience.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📄 License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is open-source and available under the [MIT License](LICENSE).
